@@ -1,13 +1,16 @@
 package com.algaworks.algashop.product.catalog.domain.model.category;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.time.OffsetDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 @Document(collection = "categories")
 @Getter
@@ -17,7 +20,7 @@ public class Category {
 
     @Id
     @EqualsAndHashCode.Include
-    private MongoId id;
+    private UUID id;
 
     private String name;
 
@@ -27,7 +30,6 @@ public class Category {
 
     private OffsetDateTime updatedAt;
 
-    @Builder(builderClassName = "BrandNewCategoryBuilder", builderMethodName = "brandNew")
     public Category(String name, Boolean enabled) {
         this.setName(name);
         this.setEnabled(enabled);
