@@ -1,0 +1,47 @@
+services:
+  wiremock:
+    image: wiremock/wiremock:3x
+    ports:
+      - "8787:8080"
+    volumes:
+      - ./etc/wiremock:/home/wiremock/mappings
+    command: --verbose --disable-http2-plain
+  algashop-postgres:
+    image: postgres:17-alpine
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - algashop-postgres:/var/lib/postgresql/data
+      - ./etc/postgres/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    healthcheck:
+      test: pg_isready -U postgres -d postgres
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  fastpay:
+    image: algaworks/fastpay:latest
+    restart: no
+    ports:
+      - 9995:9995
+    depends_on:
+      algashop-postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      FASTPAY_HOSTNAME: http://localhost:9995
+      DATABASE_JDBC_URL: jdbc:postgresql://algashop-postgres:5432/fastpay
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_FLYWAY_LOCATIONS: classpath:db/migration,classpath:db/testdata
+volumes:
+  algashop-postgres:
