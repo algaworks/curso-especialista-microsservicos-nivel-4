@@ -1,0 +1,7 @@
+server.port: 8083
+
+spring:
+  application:
+    name: product-catalog
+  mongodb:
+    uri: mongodb://root:algashop@localhost:27017/product_catalog?authSource=admin
