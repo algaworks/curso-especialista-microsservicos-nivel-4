@@ -1,0 +1,209 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "method": "PUT",
+        "urlPattern": "/api/v1/payments/pay_.*?/refund",
+        "headers": { "Token": { "matches": ".*" } }
+      },
+      "response": { "status": 204 }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "urlPattern": "/api/v1/payments/pay_.*?/cancel",
+        "headers": { "Token": { "matches": ".*" } }
+      },
+      "response": { "status": 204 }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "urlPattern": "/api/v1/public/tokenized-cards",
+        "headers": { "Token": { "matches": ".*" } },
+        "bodyPatterns": [
+          { "matchesJsonPath": "$.number" },
+          { "matchesJsonPath": "$.cvv" },
+          { "matchesJsonPath": "$.holderName" },
+          { "matchesJsonPath": "$.holderDocument" },
+          { "matchesJsonPath": "$.expMonth" },
+          { "matchesJsonPath": "$.expYear" }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "jsonBody": {
+          "tokenizedCard": "tok_1234567890abcdef",
+          "expiresAt": "2026-10-07T14:00:00Z"
+        },
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "urlPattern": "/api/v1/payments",
+        "headers": { "Token": { "matches": ".*" } },
+        "bodyPatterns": [
+          { "matchesJsonPath": "$.totalAmount" },
+          { "matchesJsonPath": "$.method"},
+          { "matchesJsonPath": "$.fullName" },
+          { "matchesJsonPath": "$.document" },
+          { "matchesJsonPath": "$.phone" },
+          { "matchesJsonPath": "$.addressLine1" },
+          { "matchesJsonPath": "$.creditCardId" },
+          { "matchesJsonPath": "$.referenceCode" },
+          { "matchesJsonPath": "$.replyToUrl" },
+          { "matchesJsonPath": "$.zipCode" }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "jsonBody": {
+          "id": "pay_123abc456def",
+          "status": "PAID",
+          "createdAt": "2025-10-07T15:00:00Z",
+          "paidAt": "2025-10-07T15:01:00Z",
+          "expiresAt": "2025-11-07T15:00:00Z",
+          "totalAmount": "{{jsonPath request.body '$.totalAmount'}}",
+          "method": "{{jsonPath request.body '$.method'}}",
+          "fullName": "{{jsonPath request.body '$.fullName'}}",
+          "document": "{{jsonPath request.body '$.document'}}",
+          "phone": "{{jsonPath request.body '$.phone'}}",
+          "referenceCode": "{{jsonPath request.body '$.referenceCode'}}",
+          "addressLine1": "{{jsonPath request.body '$.addressLine1'}}",
+          "creditCardId": "{{jsonPath request.body '$.creditCardId'}}"
+        },
+        "transformers": ["response-template"],
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "urlPattern": "/api/v1/payments",
+        "headers": { "Token": { "matches": ".*" } },
+        "bodyPatterns": [
+          { "matchesJsonPath": "$.totalAmount" },
+          { "matchesJsonPath": "$.method"},
+          { "matchesJsonPath": "$.fullName" },
+          { "matchesJsonPath": "$.document" },
+          { "matchesJsonPath": "$.phone" },
+          { "matchesJsonPath": "$.addressLine1" },
+          { "matchesJsonPath": "$.referenceCode" },
+          { "matchesJsonPath": "$.replyToUrl" },
+          { "matchesJsonPath": "$.zipCode" }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "jsonBody": {
+          "id": "pay_123abc456def",
+          "status": "PAID",
+          "createdAt": "2025-10-07T15:00:00Z",
+          "paidAt": "2025-10-07T15:01:00Z",
+          "expiresAt": "2025-11-07T15:00:00Z",
+          "totalAmount": "{{jsonPath request.body '$.totalAmount'}}",
+          "method": "{{jsonPath request.body '$.method'}}",
+          "fullName": "{{jsonPath request.body '$.fullName'}}",
+          "document": "{{jsonPath request.body '$.document'}}",
+          "phone": "{{jsonPath request.body '$.phone'}}",
+          "referenceCode": "{{jsonPath request.body '$.referenceCode'}}",
+          "addressLine1": "{{jsonPath request.body '$.addressLine1'}}"
+        },
+        "transformers": ["response-template"],
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/api/v1/payments/pay_.*$",
+        "headers": { "Token": { "matches": ".*" } }
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "id": "pay_123abc456def",
+          "totalAmount": 1000.0,
+          "status": "PAID",
+          "method": "CREDIT",
+          "fullName": "John Doe",
+          "document": "12345678900",
+          "phone": "+5511999999999",
+          "addressLine1": "Boulevard Street, 123",
+          "addressLine2": "Apt 101",
+          "creditCardId": "cc_abcdef123456",
+          "referenceCode": "{{randomValue length=36 type='UUID'}}",
+          "replyToUrl": "http://host.docker.internal:8082/api/v1/webhooks/fastpay",
+          "createdAt": "2025-10-07T15:00:00Z",
+          "paidAt": "2025-10-07T15:01:00Z",
+          "expiresAt": "2025-11-07T15:00:00Z"
+        },
+        "transformers": ["response-template"],
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/api/v1/credit-cards\\?customerCode=.*"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": [
+          { "id": "cc_1a2b3c4d5e6f", "lastNumbers": "1234", "expMonth": 12, "expYear": 2028, "brand": "Visa" },
+          { "id": "cc_6f5e4d3c2b1a", "lastNumbers": "9876", "expMonth": 11, "expYear": 2029, "brand": "Mastercard" }
+        ],
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "urlPattern": "/api/v1/credit-cards",
+        "headers": { "Token": { "matches": ".*" } },
+        "bodyPatterns": [
+          { "matchesJsonPath": "$.tokenizedCard" },
+          { "matchesJsonPath": "$.customerCode" }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "jsonBody": {
+          "id": "cc_7a8b9c0d1e2f",
+          "lastNumbers": "4455",
+          "expMonth": 6,
+          "expYear": 2030,
+          "brand": "Visa"
+        },
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/api/v1/credit-cards/cc_.*$"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "id": "{{request.path.[3]}}",
+          "lastNumbers": "1234",
+          "expMonth": 12,
+          "expYear": 2028,
+          "brand": "Visa"
+        },
+        "transformers": ["response-template"],
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "urlPattern": "/api/v1/credit-cards/cc_.*$"
+      },
+      "response": { "status": 204 }
+    }
+  ]
+}
