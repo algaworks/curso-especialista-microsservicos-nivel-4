@@ -10,7 +10,7 @@ info:
 
 servers:
   - description: Development
-    url: "http://algashop-ecommerce:9998"
+    url: "http://localhost:8083"
   - description: Production
     url: "https://api.algashop.com"
 
