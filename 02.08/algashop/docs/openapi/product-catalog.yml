@@ -100,7 +100,7 @@ paths:
                     content:
                       type: array
                       items:
-                        $ref: "#/components/schemas/Product"
+                        $ref: "#/components/schemas/ProductSummary"
     post:
       tags:
         - Products
@@ -533,7 +533,6 @@ components:
         - category
         - mainImage
         - description
-        - images
       properties:
         id:
           type: string
@@ -778,3 +777,74 @@ components:
         quantity:
           type: integer
           example: 10
+    ProductSummary:
+      type: object
+      required:
+        - id
+        - addedAt
+        - name
+        - brand
+        - slug
+        - regularPrice
+        - salePrice
+        - hasDiscount
+        - inStock
+        - enabled
+        - quantityInStock
+        - discountPercentageRounded
+        - category
+        - mainImage
+        - shortDescription
+      properties:
+        id:
+          type: string
+          example: "fcc2897f-70a8-4c87-a4d0-26a4e0bb36dc"
+        addedAt:
+          type: string
+          format: date-time
+          example: "2024-04-04T00:12:45Z"
+        name:
+          type: string
+          example: "Deep Diver X11D Gamer laptop"
+        brand:
+          type: string
+          example: "Deep Diver"
+        slug:
+          type: string
+          example: "deep-diver-x11d-gamer-laptop"
+        regularPrice:
+          type: number
+          example: 19.99
+          format: double
+        salePrice:
+          type: number
+          example: 13.99
+          format: double
+        hasDiscount:
+          type: boolean
+          example: true
+          default: false
+        inStock:
+          type: boolean
+          example: true
+          default: false
+        enabled:
+          type: boolean
+          example: true
+          default: false
+        quantityInStock:
+          type: integer
+          example: 125
+          default: 0
+        discountPercentageRounded:
+          type: integer
+          example: 35
+          default: 0
+        category:
+          $ref: "#/components/schemas/Category"
+        mainImage:
+          $ref: "#/components/schemas/Image"
+        shortDescription:
+          type: string
+          example: >
+            A Gamer Laptop to fit your needs!...
