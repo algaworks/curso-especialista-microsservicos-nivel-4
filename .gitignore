@@ -1,3 +1,4 @@
 clean-git-on-subfolders.sh
 find.sh
 V001__create-base-schema.sql
+move.sh
