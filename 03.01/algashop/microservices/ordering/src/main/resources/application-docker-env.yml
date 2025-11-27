@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://algashop-postgres:5432/ordering
+  flyway:
+    enabled: true
+    locations: classpath:db/migration,classpath:db/testdata
+    url: jdbc:postgresql://algashop-postgres:5432/ordering
+
+algashop:
+  integrations:
+    shipping.provider: RAPIDEX
+    rapidex.url: http://wiremock:8080
+    product-catalog.url: http://wiremock:8080
