@@ -1,0 +1,31 @@
+include:
+  - docker-compose.tools.yml
+services:
+  algashop-ordering:
+    image: algashop/ordering:dev
+    restart: no
+    ports:
+      - 8080:8080
+    depends_on:
+      algashop-postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+  algashop-billing:
+    image: algashop/billing:dev
+    restart: no
+    ports:
+      - 8082:8082
+    depends_on:
+      algashop-postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    environment:
+      SPRING_PROFILES_ACTIVE: docker

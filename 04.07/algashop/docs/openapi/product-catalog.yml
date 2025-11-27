@@ -1,0 +1,850 @@
+openapi: 3.0.0
+
+info:
+  title: AlgaShop - Product Catalog API
+  version: "1.0"
+  contact:
+    email: contact@algashop.com
+    name: AlgaShop
+    url: "https://algashop.com"
+
+servers:
+  - description: Development
+    url: "http://localhost:8083"
+  - description: Production
+    url: "https://api.algashop.com"
+
+paths:
+  /api/v1/products:
+    get:
+      tags:
+        - Products
+      parameters:
+        - schema:
+            type: string
+            example: Notebook Gamer
+          in: query
+          name: term
+          description: Search term for multiple fields, like name, description, brand.
+          required: false
+        - schema:
+            type: boolean
+            example: true
+          in: query
+          name: hasDiscount
+          description: Products with discount
+          required: false
+        - schema:
+            type: boolean
+            example: true
+          in: query
+          name: enabled
+          description: Only enabled products or disabled
+          required: false
+        - schema:
+            type: boolean
+            example: true
+          in: query
+          name: inStock
+          description: Only products in stock or out of stock
+          required: false
+        - schema:
+            type: number
+            example: 100.99
+          in: query
+          name: priceFrom
+          description: Minimum price
+          required: false
+        - schema:
+            type: number
+            example: 100.99
+          in: query
+          name: priceTo
+          description: Maximum price
+          required: false
+        - schema:
+            type: string
+            example: "9e965c97-93c2-4d71-970f-0e8bf24ba0fb"
+          in: query
+          name: categoriesId
+          description: Categories id
+          required: false
+        - schema:
+            type: string
+            format: yyyy-mm-dd
+            example: "2024-09-01"
+          in: query
+          name: addedAtFrom
+          description: Initial product creation date
+        - schema:
+            type: string
+            format: yyyy-mm-dd
+            example: "2024-09-01"
+          in: query
+          name: addedAtTo
+          description: End product creation date
+        - $ref: "#/components/parameters/pageNumber"
+        - $ref: "#/components/parameters/pageSize"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/direction"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/Page"
+                - type: object
+                  properties:
+                    content:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/ProductSummary"
+    post:
+      tags:
+        - Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          $ref: "#/components/responses/NotFound"  
+  /api/v1/products/{productId}:
+    get:
+      tags:
+        - Products
+      parameters:
+      - schema:
+          type: string
+        name: productId
+        in: path
+        required: true
+        example: "fcc2897f-70a8-4c87-a4d0-26a4e0bb36dc"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - Products
+      parameters:
+      - schema:
+          type: string
+        name: productId
+        in: path
+        required: true
+        example: "fcc2897f-70a8-4c87-a4d0-26a4e0bb36dc"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          $ref: "#/components/responses/NotFound"  
+
+  /api/v1/products/{productId}/enable:
+    put:
+      tags:
+        - Products
+      parameters:
+      - schema:
+          type: string
+        name: productId
+        in: path
+        required: true
+        example: "fcc2897f-70a8-4c87-a4d0-26a4e0bb36dc"
+      responses:
+        "204":
+          description: OK
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - Products
+      parameters:
+        - schema:
+            type: string
+          name: productId
+          in: path
+          required: true
+          example: "fcc2897f-70a8-4c87-a4d0-26a4e0bb36dc"
+      responses:
+        "204":
+          description: OK
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/v1/products/{productId}/restock:
+    post:
+      tags:
+        - Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductQuantityInput"
+      responses:
+        "204":
+          description: OK
+        "404":
+          $ref: "#/components/responses/NotFound"  
+  /api/v1/products/{productId}/withdraw:
+    post:
+      tags:
+        - Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductQuantityInput"
+      responses:
+        "204":
+          description: OK
+        "404":
+          $ref: "#/components/responses/NotFound"  
+
+  /api/v1/categories:
+    get:
+      tags:
+        - Categories
+      parameters:
+        - schema:
+            type: boolean
+            example: true
+          in: query
+          name: enabled
+          description: Only enabled categories
+          required: false
+        - schema:
+            type: boolean
+            example: true
+          in: query
+          name: name
+          description: Category name
+          required: false
+        - $ref: "#/components/parameters/pageNumber"
+        - $ref: "#/components/parameters/pageSize"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/direction"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/Page"
+                - type: object
+                  properties:
+                    content:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/Category"
+    post:
+      tags:
+        - Categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryInput"
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "404":
+          $ref: "#/components/responses/NotFound"  
+  /api/v1/categories/{categoryId}:
+    get:
+      tags:
+        - Categories
+      parameters:
+      - schema:
+          type: string
+        name: categoryId
+        in: path
+        required: true
+        example: "f5ab7a1e-37da-41e1-892b-a1d38275c2f2"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - Categories
+      parameters:
+      - schema:
+          type: string
+        name: categoryId
+        in: path
+        required: true
+        example: "f5ab7a1e-37da-41e1-892b-a1d38275c2f2"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "404":
+          $ref: "#/components/responses/NotFound"  
+    delete:
+      tags:
+        - Categories
+      parameters:
+      - schema:
+          type: string
+        name: categoryId
+        in: path
+        required: true
+        example: "f5ab7a1e-37da-41e1-892b-a1d38275c2f2"
+      responses:
+        "204":
+          description: OK
+        "404":
+          $ref: "#/components/responses/NotFound"  
+
+  /api/v1/products/{productId}/images:
+    post:
+      tags:
+        - Products Images
+      parameters:
+      - schema:
+          type: string
+        name: productId
+        in: path
+        required: true
+        example: "fcc2897f-70a8-4c87-a4d0-26a4e0bb36dc"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImageInput"
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Image"
+    get:
+      tags:
+        - Products Images
+      parameters:
+      - schema:
+          type: string
+        name: productId
+        in: path
+        required: true
+        example: "fcc2897f-70a8-4c87-a4d0-26a4e0bb36dc"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Image"
+  /api/v1/products/{productId}/images/{imageId}:
+    get:
+      tags:
+      - Products Images
+      parameters:
+      - schema:
+          type: string
+        name: productId
+        in: path
+        required: true
+        example: "fcc2897f-70a8-4c87-a4d0-26a4e0bb36dc"
+      - schema:
+          type: string
+        name: imageId
+        in: path
+        required: true
+        example: "28fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Image"
+    delete:
+      tags:
+      - Products Images
+      parameters:
+      - schema:
+          type: integer
+        name: productId
+        in: path
+        required: true
+        example: 1
+      - schema:
+          type: integer
+        name: imageId
+        in: path
+        required: true
+        example: 1
+      responses:
+        "204":
+          description: OK
+        "404":
+          $ref: "#/components/responses/NotFound"      
+  /api/v1/products/{productId}/images/{imageId}/primary:
+    put:
+      tags:
+        - Products Images
+      parameters:
+      - schema:
+          type: string
+        name: productId
+        in: path
+        required: true
+        example: "fcc2897f-70a8-4c87-a4d0-26a4e0bb36dc"
+      - schema:
+          type: string
+        name: imageId
+        in: path
+        required: true
+        example: "28fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+      responses:
+        "204":
+          description: OK
+
+  /api/v1/upload-requests:
+    post:
+      tags:
+        - Upload Requests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadResponse"
+
+components:
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/problem+json:
+          schema:
+              $ref: "#/components/schemas/ProblemDetail"
+    BadRequest:
+      description: Invalid request
+      content:
+        application/problem+json:
+          schema:
+              $ref: "#/components/schemas/ProblemDetail"
+    InternalError:
+      description: Internal server error
+      content:
+        application/problem+json:
+          schema:
+              $ref: "#/components/schemas/ProblemDetail"
+  parameters:
+    pageNumber:
+      schema:
+        type: number
+        format: int32
+        minimum: 0
+      name: page
+      description: Page number
+      in: query
+    pageSize:
+      schema:
+        type: number
+        format: int32
+        minimum: 1
+        example: 10
+      name: size
+      description: Page size
+      in: query
+    sort:
+      schema:
+        type: string
+        example: "name"
+      name: sort
+      description: Order by property
+      in: query
+    direction:
+      schema:
+        type: string
+        example: "desc"
+      name: direction
+      description: Direction
+      in: query
+  schemas: 
+    Product:
+      type: object
+      required:
+        - id
+        - addedAt
+        - name
+        - brand
+        - slug
+        - regularPrice
+        - salePrice
+        - hasDiscount
+        - inStock
+        - enabled
+        - quantityInStock
+        - discountPercentageRounded
+        - category
+        - mainImage
+        - description
+      properties:
+        id:
+          type: string
+          example: "fcc2897f-70a8-4c87-a4d0-26a4e0bb36dc"
+        addedAt:
+          type: string
+          format: date-time
+          example: "2024-04-04T00:12:45Z"
+        name:
+          type: string
+          example: "Deep Diver X11D Gamer laptop"
+        brand:
+          type: string
+          example: "Deep Diver"
+        slug:
+          type: string
+          example: "deep-diver-x11d-gamer-laptop"
+        regularPrice:
+          type: number
+          example: 19.99
+          format: double
+        salePrice:
+          type: number
+          example: 13.99
+          format: double
+        hasDiscount:
+          type: boolean
+          example: true
+          default: false
+        inStock:
+          type: boolean
+          example: true
+          default: false
+        enabled:
+          type: boolean
+          example: true
+          default: false
+        quantityInStock:
+          type: integer
+          example: 125
+          default: 0
+        discountPercentageRounded:
+          type: integer
+          example: 35
+          default: 0
+        category:
+          $ref: "#/components/schemas/Category"
+        mainImage:
+          $ref: "#/components/schemas/Image"
+        description:
+          type: string
+          example: >
+            A Gamer Laptop to fit your needs!
+            - RAM: 32GB
+            - SSD: 1TB
+            - Screen size: 5/16"
+            - Resolution: 1920x1080
+    Image:
+      type: object
+      required:
+        - id
+        - url
+      properties:
+        id:
+          type: string
+          example: "28fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+        url:
+          type: string
+          example: "https://images.algashop.com/28fcd9fb-4ce7-44d6-9583-14d8b3dc5aff.jpg"
+    Category:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - enabled
+      properties:
+        id:
+          type: string
+          example: "fcc2897f-70a8-4c87-a4d0-26a4e0bb36dc"
+        name:
+          type: string
+          example: "Computer Components"
+        slug:
+          type: string
+          example: "computer-components"
+        enabled:
+          type: boolean
+          example: true
+    Page:
+      type: object
+      required:
+        - number
+        - size
+        - totalPages
+        - totalElements
+        - content
+      properties:
+        number:
+          type: integer
+          format: int32
+          example: 2
+        size:
+          type: number
+          format: int32
+          example: 9
+        totalPages:
+          type: integer
+          format: int32
+          example: 15
+        totalElements:
+          type: number
+          format: int32
+          example: 442
+    ProblemDetail:
+      title: Problem
+      type: object
+      required:
+        - status
+        - type
+        - title
+        - instance
+      description: >
+        Represents an issue in communication with the API.
+        This representation model is based on RFC 7807 (Problem Details for HTTP APIs).
+      properties:
+        status:
+          type: integer
+          example: 400
+        type:
+          type: string
+          example: "/errors/invalid-data"
+        title:
+          type: string
+          example: Invalid fields
+        instance:
+          type: string
+          example: "/api/v1/customers"
+        detail:
+          type: string
+          example: One or more fields are invalid
+        fields:
+          type: object
+          description: Fields that caused the error
+    CategoryInput:
+      type: object
+      required:
+        - name
+        - enabled
+      properties:
+        name:
+          type: string
+          example: "Computer components"
+        enabled:
+          type: boolean
+          example: true
+    ProductInput:
+      required:
+        - name
+        - enabled
+        - brand
+        - regularPrice
+        - salePrice
+        - categoryId
+      properties:
+        name:
+          type: string
+          example: "Deep Diver X11D Gamer laptop"
+        brand:
+          type: string
+          example: "Deep Diver"
+        regularPrice:
+          type: number
+          example: 19.99
+          minimum: 1
+          maximum: 100000
+        salePrice:
+          type: number
+          example: 13.99
+          minimum: 1
+          maximum: 100000
+        enabled:
+          type: boolean
+          example: true
+          default: false
+        categoryId:
+          type: string
+          example: "f5ab7a1e-37da-41e1-892b-a1d38275c2f2"
+        description:
+          type: string
+          example: >
+            A Gamer Laptop to fit your needs!
+            - RAM: 32GB
+            - SSD: 1TB
+            - Screen size: 5/16"
+            - Resolution: 1920x1080
+    UploadRequest:
+      type: object
+      required:
+        - originalFileName
+        - contentLength
+      properties:
+        originalFileName:
+          type: string
+          example: "image-12.png"
+        contentLength:
+          type: integer
+          example: 13422
+    UploadResponse:
+      type: object
+      required:
+        - remoteFileName
+        - contentLength
+        - contentType
+        - uploadSignedUrl
+      properties:
+        remoteFileName:
+          type: string
+          example: "28fcd9fb-4ce7-44d6-9583-14d8b3dc5aff.png"
+        contentLength:
+          type: integer
+          example: 13422
+        contentType:
+          type: string
+          example: 'image/png'
+        uploadSignedUrl:
+          type: string
+          example: "https://images.algashop.com/28fcd9fb-4ce7-44d6-9583-14d8b3dc5aff.png"
+    ImageInput:
+      type: object
+      required:
+        - remoteFileName
+      properties:
+        remoteFileName:
+          type: string
+          example: "28fcd9fb-4ce7-44d6-9583-14d8b3dc5aff.jpg"
+    ProductQuantityInput:
+      type: object
+      required:
+        - quantity
+      properties:
+        quantity:
+          type: integer
+          example: 10
+    ProductSummary:
+      type: object
+      required:
+        - id
+        - addedAt
+        - name
+        - brand
+        - slug
+        - regularPrice
+        - salePrice
+        - hasDiscount
+        - inStock
+        - enabled
+        - quantityInStock
+        - discountPercentageRounded
+        - category
+        - mainImage
+        - shortDescription
+      properties:
+        id:
+          type: string
+          example: "fcc2897f-70a8-4c87-a4d0-26a4e0bb36dc"
+        addedAt:
+          type: string
+          format: date-time
+          example: "2024-04-04T00:12:45Z"
+        name:
+          type: string
+          example: "Deep Diver X11D Gamer laptop"
+        brand:
+          type: string
+          example: "Deep Diver"
+        slug:
+          type: string
+          example: "deep-diver-x11d-gamer-laptop"
+        regularPrice:
+          type: number
+          example: 19.99
+          format: double
+        salePrice:
+          type: number
+          example: 13.99
+          format: double
+        hasDiscount:
+          type: boolean
+          example: true
+          default: false
+        inStock:
+          type: boolean
+          example: true
+          default: false
+        enabled:
+          type: boolean
+          example: true
+          default: false
+        quantityInStock:
+          type: integer
+          example: 125
+          default: 0
+        discountPercentageRounded:
+          type: integer
+          example: 35
+          default: 0
+        category:
+          $ref: "#/components/schemas/Category"
+        mainImage:
+          $ref: "#/components/schemas/Image"
+        shortDescription:
+          type: string
+          example: >
+            A Gamer Laptop to fit your needs!...

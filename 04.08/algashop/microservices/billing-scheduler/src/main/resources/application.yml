@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    active: development
+    group:
+      development:
+        - base
+        - development-env
+      docker:
+        - base
+        - development-env
+        - docker-env
+      production:
+        - base
+        - production-env
