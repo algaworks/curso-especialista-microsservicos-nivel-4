@@ -504,14 +504,14 @@ components:
       schema:
         type: string
         example: "name"
-      name: sort
+      name: sortByProperty
       description: Order by property
       in: query
     direction:
       schema:
         type: string
         example: "desc"
-      name: direction
+      name: sortDirection
       description: Direction
       in: query
   schemas: 
