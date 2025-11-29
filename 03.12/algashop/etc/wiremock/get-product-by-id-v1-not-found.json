@@ -1,0 +1,21 @@
+{
+  "id" : "9a71564f-0bbd-4c80-85b1-e53a3f184776",
+  "request" : {
+    "url" : "/api/v1/products/21651a12-b126-4213-ac21-19f66ff4642e",
+    "method" : "GET",
+    "headers" : {
+      "Accept" : {
+        "matches" : "application/json.*"
+      }
+    }
+  },
+  "response" : {
+    "status" : 404,
+    "body" : "{\"instance\":\"{{{request.path}}}\",\"type\":\"/errors/not-found\",\"title\":\"Not found\"}",
+    "headers" : {
+      "Content-Type" : "application/problem+json"
+    },
+    "transformers" : [ "response-template", "spring-cloud-contract" ]
+  },
+  "uuid" : "9a71564f-0bbd-4c80-85b1-e53a3f184776"
+}

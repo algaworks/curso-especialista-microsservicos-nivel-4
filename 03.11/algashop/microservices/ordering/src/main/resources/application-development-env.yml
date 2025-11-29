@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ordering
+    username: postgres
+    password: postgres
+  jpa:
+    show-sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration,classpath:db/testdata
+    user: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/ordering
+
+algashop:
+  integrations:
+    shipping.provider: RAPIDEX
+    rapidex.url: http://localhost:8787
+    product-catalog.url: http://localhost:8787

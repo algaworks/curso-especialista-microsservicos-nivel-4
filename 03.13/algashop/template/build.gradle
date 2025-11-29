@@ -1,0 +1,120 @@
+buildscript {
+	dependencies {
+		classpath 'org.flywaydb:flyway-core:11.13.0'
+		classpath 'org.flywaydb:flyway-database-postgresql:11.13.0'
+	}
+}
+
+plugins {
+	id 'idea'
+	id 'java'
+	id 'org.springframework.boot' version '3.5.6'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.springframework.cloud.contract' version '4.3.0'
+	id 'org.flywaydb.flyway' version '11.13.0'
+}
+
+group = 'com.algaworks.algashop'
+version = '0.0.1-SNAPSHOT'
+description = 'Template project'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(25)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	mockitoAgent
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('springCloudVersion', "2025.0.0")
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-database-postgresql'
+	runtimeOnly 'org.postgresql:postgresql'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.cloud:spring-cloud-starter-contract-verifier'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+	mockitoAgent('org.mockito:mockito-core:5.14.2') {transitive = false}
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+contracts {
+}
+
+tasks.named('contractTest') {
+	useJUnitPlatform()
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+test {
+	filter {
+		excludeTestsMatching("*IT")
+	}
+	jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
+}
+
+tasks.named('check') {
+	dependsOn(test, contractTest, integrationTest)
+}
+
+tasks.register('integrationTest', Test) {
+	description = 'Run integration tests.'
+	group = 'verification'
+	jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
+
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+
+	shouldRunAfter test
+
+	useJUnitPlatform()
+
+	testLogging {
+		events "passed"
+	}
+
+	filter {
+		includeTestsMatching "*IT"
+		excludeTestsMatching "*Test"
+	}
+}
+
+bootJar {
+	archiveFileName = 'template.jar'
+}
+
+tasks.register('dockerBuild', Exec) {
+	description = 'Builds a multi-platform Docker image using Buildx'
+	group = 'build'
+	dependsOn('bootJar')
+	workingDir project.rootDir
+	commandLine 'docker', 'buildx', 'build', '--platform', 'linux/arm64/v8,linux/amd64',
+			'--tag', 'algashop/template:dev', '.'
+}
