@@ -236,8 +236,8 @@ paths:
           description: Only enabled categories
           required: false
         - schema:
-            type: boolean
-            example: true
+            type: string
+            example: Laptop
           in: query
           name: name
           description: Category name

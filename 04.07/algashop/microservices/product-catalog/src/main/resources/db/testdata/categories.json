@@ -1,0 +1,84 @@
+[{
+  "_id": {
+    "$uuid": "e0c4271d-0016-4a42-82fe-bf695a9fb9b8"
+  },
+  "name": "Laptops",
+  "enabled": true,
+  "addedAt": {
+    "$date": "2024-04-26T12:53:43.291Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-26T12:53:43.291Z"
+  },
+  "createdByUserId": {
+    "$uuid": "019ac149-6c80-7842-aa23-781d8d390f87"
+  },
+  "lastModifiedByUserId": {
+    "$uuid": "019ac149-6c80-7842-aa23-781d8d390f87"
+  },
+  "version": 0,
+  "_class": "com.algaworks.algashop.product.catalog.domain.model.category.Category"
+},
+{
+  "_id": {
+    "$uuid": "c4edfdd5-c71e-47aa-8f00-2925abbbb75f"
+  },
+  "name": "Desktops",
+  "enabled": true,
+  "addedAt": {
+    "$date": "2024-04-26T12:53:51.612Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-26T12:53:51.612Z"
+  },
+  "createdByUserId": {
+    "$uuid": "019ac149-6c80-7842-aa23-781d8d390f87"
+  },
+  "lastModifiedByUserId": {
+    "$uuid": "019ac149-6c80-7842-aa23-781d8d390f87"
+  },
+  "version": 0,
+  "_class": "com.algaworks.algashop.product.catalog.domain.model.category.Category"
+},
+{
+  "_id": {
+    "$uuid": "ef5981cb-ed9b-42f0-a417-533cc43c605a"
+  },
+  "name": "Hardware",
+  "enabled": true,
+  "addedAt": {
+    "$date": "2024-04-26T12:55:03.637Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-26T12:55:03.637Z"
+  },
+  "createdByUserId": {
+    "$uuid": "019ac149-6c80-7842-aa23-781d8d390f87"
+  },
+  "lastModifiedByUserId": {
+    "$uuid": "019ac149-6c80-7842-aa23-781d8d390f87"
+  },
+  "version": 0,
+  "_class": "com.algaworks.algashop.product.catalog.domain.model.category.Category"
+},
+{
+  "_id": {
+    "$uuid": "d2468e17-35f2-46e7-b51d-24c01315ab29"
+  },
+  "name": "Cell Phones",
+  "enabled": true,
+  "addedAt": {
+    "$date": "2024-04-26T12:57:02.306Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-26T12:57:02.306Z"
+  },
+  "createdByUserId": {
+    "$uuid": "019ac149-6c80-7842-aa23-781d8d390f87"
+  },
+  "lastModifiedByUserId": {
+    "$uuid": "019ac149-6c80-7842-aa23-781d8d390f87"
+  },
+  "version": 0,
+  "_class": "com.algaworks.algashop.product.catalog.domain.model.category.Category"
+}]
