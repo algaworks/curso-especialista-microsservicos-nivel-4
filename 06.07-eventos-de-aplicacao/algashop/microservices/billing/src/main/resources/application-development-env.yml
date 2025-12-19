@@ -1,0 +1,24 @@
+server.port: 8082
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/billing
+    username: postgres
+    password: postgres
+  jpa:
+    show-sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration,classpath:db/testdata
+    user: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/billing
+
+algashop:
+  integrations:
+    payment:
+      provider: FASTPAY
+      fastpay:
+        hostname: http://localhost:9995
+        private-token: SSEewtC6Ps5yJLdB6SJmh1bqJXgRbCdf8ocDj2hU
+        webhook-url: http://host.docker.internal:8082/api/v1/webhooks/fastpay

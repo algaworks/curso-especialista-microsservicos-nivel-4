@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://algashop-postgres:5432/template
+  flyway:
+    enabled: true
+    locations: classpath:db/migration,classpath:db/testdata
+    url: jdbc:postgresql://algashop-postgres:5432/template
+
