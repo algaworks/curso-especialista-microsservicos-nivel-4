@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/billing
+    username: postgres
+    password: postgres
+
+algashop:
+  integrations:
+    payment:
+      fastpay:
+        hostname: http://localhost:9995
+        private-token: SSEewtC6Ps5yJLdB6SJmh1bqJXgRbCdf8ocDj2hU

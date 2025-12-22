@@ -86,7 +86,7 @@ public class Product extends AbstractAggregateRoot<Product> {
         this.setSalePrice(salePrice);
         this.setCategory(category);
 
-        super.registerEvent(ProductAddedEvent.builder().productId(this.id));
+        super.registerEvent(ProductAddedEvent.builder().productId(this.id).build());
     }
 
     public void setName(String name) {
