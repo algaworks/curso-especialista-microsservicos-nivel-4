@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: ${DATASOURCE_JDBC_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+  jpa:
+    show-sql: true
+  flyway:
+    enabled: false
+    locations: classpath:db/migration
+    user: ${FLYWAY_USERNAME}
+    password: ${FLYWAY_PASSWORD}
+    url: ${DATASOURCE_JDBC_URL}
+
+algashop:
+  integrations:
+    payment:
+      provider: FASTPAY
+      fastpay:
+        hostname: ${FASTPAY_HOSTNAME}
+        private-token: ${FASTPAY_PRIVATE_TOKEN}
+        webhook-url: ${FASTPAY_WEBHOOK_URL}

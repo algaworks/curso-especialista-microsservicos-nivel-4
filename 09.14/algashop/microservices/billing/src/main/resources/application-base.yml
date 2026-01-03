@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: billing
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+  flyway:
+    enabled: false
+    locations: classpath:db/migration
+
+algashop:
+  integrations:
+    payment:
+      provider: FASTPAY

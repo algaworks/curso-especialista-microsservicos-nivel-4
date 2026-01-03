@@ -1,0 +1,24 @@
+spring:
+  cache:
+    type: redis
+  mongodb:
+    uri: mongodb://localhost:27017,localhost:27018,localhost:27019/product_catalog?replicaSet=rs0
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: algashop
+      database: 0
+      timeout: 600
+
+logging:
+  level:
+    org.mongodb.driver.protocol.command: DEBUG
+#    org.mongodb.driver.protocol.query: DEBUG
+#    org.mongodb.driver.connection: DEBUG
+    org.mongodb.driver.cluster: OFF
+
+algashop:
+  data-load:
+    enabled: true
+    auto-delete: true
