@@ -1,0 +1,114 @@
+{
+  "mappings": [
+    {
+      "priority": 1,
+      "request": {
+        "method": "POST",
+        "url": "/api/delivery-cost",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": "$[?(!@.originZipCode || !@.destinationZipCode)]"
+          }
+        ]
+      },
+      "response": {
+        "status": 400,
+        "jsonBody": {
+          "error": "INVALID_REQUEST",
+          "message": "originZipCode and destinationZipCode are required"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "priority": 2,
+      "request": {
+        "method": "POST",
+        "url": "/api/delivery-cost",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": "$[?(@.destinationZipCode == '12346')]"
+          }
+        ]
+      },
+      "response": {
+        "status": 500,
+        "jsonBody": {
+          "error": "INTERNAL_ERROR",
+          "message": "Unexpected error while calculating delivery cost"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "priority": 3,
+      "request": {
+        "method": "POST",
+        "url": "/api/delivery-cost",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": "$[?(@.destinationZipCode == '12347')]"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "fixedDelayMilliseconds": 15000,
+        "jsonBody": {
+          "deliveryCost": "35.00",
+          "estimatedDaysToDeliver": "7"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "priority": 1,
+      "request": {
+        "method": "POST",
+        "url": "/api/delivery-cost",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": "$[?(@.destinationZipCode == '12348')]"
+          }
+        ]
+      },
+      "response": {
+        "status": 400,
+        "jsonBody": {
+          "error": "INVALID_REQUEST",
+          "message": "DestinationZipCode is invalid"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "priority": 10,
+      "request": {
+        "method": "POST",
+        "url": "/api/delivery-cost",
+        "bodyPatterns": [
+          { "matchesJsonPath": "$.originZipCode" },
+          { "matchesJsonPath": "$.destinationZipCode" }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "deliveryCost": "35.00",
+          "estimatedDaysToDeliver": "7"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

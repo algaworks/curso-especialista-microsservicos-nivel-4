@@ -1,0 +1,1 @@
+alter table public."order" add billing_email varchar(255) null;
