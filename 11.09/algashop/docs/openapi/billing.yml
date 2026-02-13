@@ -1,0 +1,498 @@
+openapi: 3.0.4
+
+info:
+  title: AlgaShop - Billing API
+  version: "1.0"
+
+servers:
+  - description: Development
+    url: "http://localhost:8082"
+  - description: Production
+    url: "https://api.algashop.com"
+
+paths:
+  /api/v1/orders/{orderId}/invoice:
+    post:
+      description: Generate invoice for an order
+      parameters:
+        - schema:
+            type: string
+          name: orderId
+          in: path
+          required: true
+          example: "01226N0640J7Q"
+      tags:
+        - Order Invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvoiceInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    get:
+      tags:
+        - Order Invoice
+      parameters:
+        - schema:
+            type: string
+          name: orderId
+          in: path
+          required: true
+          example: "01226N0640J7Q"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/customers/{customerId}/credit-cards:
+    get:
+      tags:
+        - Credit Cards
+      parameters:
+        - schema:
+            type: string
+          name: customerId
+          in: path
+          required: true
+          example: "28fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CreditCard"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags:
+        - Credit Cards
+      parameters:
+        - schema:
+            type: string
+          name: customerId
+          in: path
+          required: true
+          example: "28fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenizedCreditCardInput"
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreditCard"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/v1/customers/{customerId}/credit-cards/{creditCardId}:
+    get:
+      tags:
+        - Credit Cards
+      parameters:
+        - schema:
+            type: string
+          name: customerId
+          in: path
+          required: true
+          example: "28fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+        - schema:
+            type: string
+          name: creditCardId
+          in: path
+          required: true
+          example: "18fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreditCard"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - Credit Cards
+      parameters:
+        - schema:
+            type: string
+          name: customerId
+          in: path
+          required: true
+          example: "28fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+        - schema:
+            type: string
+          name: creditCardId
+          in: path
+          required: true
+          example: "18fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+      responses:
+        "204":
+          description: OK
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+    BadRequest:
+      description: Invalid request
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+    InternalError:
+      description: Internal server error
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+  parameters:
+    pageNumber:
+      schema:
+        type: number
+        format: int32
+        minimum: 0
+      name: page
+      description: Page number
+      in: query
+    pageSize:
+      schema:
+        type: number
+        format: int32
+        minimum: 1
+        example: 10
+      name: size
+      description: Page size
+      in: query
+    sort:
+      schema:
+        type: string
+        example: "name"
+      name: sort
+      description: Order by property
+      in: query
+    direction:
+      schema:
+        type: string
+        example: "desc"
+      name: direction
+      description: Direction
+      in: query
+  schemas:
+    ProblemDetail:
+      title: Problem
+      type: object
+      required:
+        - status
+        - type
+        - title
+        - instance
+      description: >
+        Represents an issue in communication with the API.
+        This representation model is based on RFC 7807 (Problem Details for HTTP APIs).
+      properties:
+        status:
+          type: integer
+          example: 400
+        type:
+          type: string
+          example: "/errors/invalid-data"
+        title:
+          type: string
+          example: Invalid fields
+        instance:
+          type: string
+          example: "/api/v1/customers"
+        detail:
+          type: string
+          example: One or more fields are invalid
+        fields:
+          type: object
+          description: Fields that caused the error
+    Invoice:
+      type: object
+      required:
+        - id
+        - orderId
+        - customerId
+        - issuedAt
+        - expiresAt
+        - totalAmount
+        - status
+        - payer
+        - items
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "28fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+        orderId:
+          type: string
+          example: "01226N0640J7Q"
+        customerId:
+          type: string
+          format: uuid
+          example: "28fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+        issuedAt:
+          type: string
+          format: date-time
+          example: "2025-09-11T10:00:00Z"
+        paidAt:
+          type: string
+          format: date-time
+          nullable: true
+        canceledAt:
+          type: string
+          format: date-time
+          nullable: true
+        expiresAt:
+          type: string
+          format: date-time
+          example: "2025-09-14T10:00:00Z"
+        totalAmount:
+          type: number
+          format: decimal
+          example: 199.90
+        cancelReason:
+          type: string
+          nullable: true
+          example: "Payment refunded"
+        status:
+          $ref: "#/components/schemas/InvoiceStatus"
+        paymentSettings:
+          $ref: "#/components/schemas/PaymentSettings"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/LineItem"
+        payer:
+          $ref: "#/components/schemas/Payer"
+    LineItem:
+      type: object
+      required:
+        - number
+        - name
+        - amount
+      properties:
+        number:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Notebook H11 - x2"
+        amount:
+          type: number
+          format: decimal
+          example: 4100.90
+    PaymentSettings:
+      type: object
+      required:
+        - id
+        - method
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "38fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+        creditCardId:
+          type: string
+          format: uuid
+          nullable: true
+          example: "18fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+        gatewayCode:
+          type: string
+          nullable: true
+          example: "GW-328982"
+        method:
+          $ref: "#/components/schemas/PaymentMethod"
+    Payer:
+      type: object
+      required:
+        - fullName
+        - document
+        - phone
+        - email
+        - address
+      properties:
+        fullName:
+          type: string
+          example: "John Doe"
+        document:
+          type: string
+          example: "255-08-0578"
+        phone:
+          type: string
+          example: "5511912341234"
+        email:
+          type: string
+          format: email
+          example: "john.doe@email.com"
+        address:
+          $ref: "#/components/schemas/Address"
+    Address:
+      type: object
+      required:
+        - street
+        - number
+        - neighborhood
+        - city
+        - state
+        - zipCode
+      properties:
+        street:
+          type: string
+          example: "Bourbon Street"
+        number:
+          type: string
+          example: "1200"
+        complement:
+          type: string
+          example: "Apt. 901"
+        neighborhood:
+          type: string
+          example: "North Ville"
+        city:
+          type: string
+          example: "Yostfort"
+        state:
+          type: string
+          example: "South Carolina"
+        zipCode:
+          type: string
+          example: "70283"
+    InvoiceInput:
+      type: object
+      required:
+        - customerId
+        - payer
+        - paymentSettings
+        - items
+      properties:
+        customerId:
+          type: string
+          format: uuid
+          example: "28fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+        paymentSettings:
+          $ref: "#/components/schemas/PaymentSettingsInput"
+        payer:
+          $ref: "#/components/schemas/Payer"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/LineItemInput"
+    LineItemInput:
+      type: object
+      required:
+        - name
+        - amount
+      properties:
+        name:
+          type: string
+          example: "Notebook H11 - x2"
+        amount:
+          type: number
+          format: decimal
+          example: 4100.90
+    PaymentSettingsInput:
+      type: object
+      required:
+        - method
+      properties:
+        creditCardId:
+          type: string
+          format: uuid
+          nullable: true
+          example: "18fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+        method:
+          $ref: "#/components/schemas/PaymentMethod"
+    InvoiceStatus:
+      type: string
+      example: "UNPAID"
+      enum:
+        - "PAID"
+        - "UNPAID"
+        - "CANCELED"
+    PaymentMethod:
+      type: string
+      example: "CREDIT_CARD"
+      enum:
+        - "GATEWAY_BALANCE"
+        - "CREDIT_CARD"
+    PaymentStatus:
+      type: string
+      example: "PENDING"
+      enum:
+        - "PENDING"
+        - "PROCESSING"
+        - "PAID"
+        - "FAILED"
+    CreditCard:
+      type: object
+      required:
+        - id
+        - lastNumbers
+        - expMonth
+        - expYear
+        - brand
+      properties:
+        id:
+          type: string
+          example: "28fcd9fb-4ce7-44d6-9583-14d8b3dc5aff"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-09-11T10:00:00Z"
+        lastNumbers:
+          type: string
+          example: "0069"
+        expMonth:
+          type: string
+          example: 1
+        expYear:
+          type: string
+          example: 2023
+        brand:
+          type: string
+          example: "Master"
+    TokenizedCreditCardInput:
+      type: object
+      required:
+        - tokenizedCard
+      properties:
+        tokenizedCard:
+          type: string
+          example: "14d8b3dc5aff"
+    

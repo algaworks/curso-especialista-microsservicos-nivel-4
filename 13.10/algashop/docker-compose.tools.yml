@@ -1,0 +1,182 @@
+services:
+  wiremock:
+    image: wiremock/wiremock:3x
+    ports:
+      - "8787:8080"
+    volumes:
+      - ./etc/wiremock:/home/wiremock/mappings
+    command: --verbose --disable-http2-plain
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+  algashop-postgres:
+    image: postgres:17-alpine
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - algashop-postgres:/var/lib/postgresql/data
+      - ./etc/postgres/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    healthcheck:
+      test: pg_isready -U postgres -d postgres
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  fastpay:
+    image: algaworks/fastpay:latest
+    restart: no
+    ports:
+      - 9995:9995
+    depends_on:
+      algashop-postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      FASTPAY_HOSTNAME: http://localhost:9995
+      DATABASE_JDBC_URL: jdbc:postgresql://algashop-postgres:5432/fastpay
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_FLYWAY_LOCATIONS: classpath:db/migration,classpath:db/testdata
+  algashop-mongodb-1:
+    image: mongo:8
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - 27017:27017
+    restart: no
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    volumes:
+      - algashop-mongodb-1:/data/db
+  algashop-mongodb-2:
+    image: mongo:8
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - 27018:27017
+    restart: no
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    volumes:
+      - algashop-mongodb-2:/data/db
+  algashop-mongodb-3:
+    image: mongo:8
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - 27019:27017
+    restart: no
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    volumes:
+      - algashop-mongodb-3:/data/db
+  algashop-mongodb-init:
+    image: mongo:8
+    depends_on:
+      algashop-mongodb-1:
+        condition: service_healthy
+      algashop-mongodb-2:
+        condition: service_healthy
+      algashop-mongodb-3:
+        condition: service_healthy
+    entrypoint: ["bash", "-c"]
+    command: >
+      "
+      echo 'Configuring MongoDB replica set...'
+
+      mongosh --host algashop-mongodb-1 --eval '
+        rs.initiate({
+          _id: \"rs0\",
+          members: [
+            { _id: 0, host: \"algashop-mongodb-1:27017\", priority: 2},
+            { _id: 1, host: \"algashop-mongodb-2:27017\", priority: 0},
+            { _id: 2, host: \"algashop-mongodb-3:27017\", priority: 0}
+          ]
+        })
+      ' || true;
+
+      mongosh --host algashop-mongodb-1 --eval 'printjson(rs.status())'
+      "
+    restart: no
+  algashop-redis:
+    image: redis:8.4
+    restart: no
+    ports:
+      - 6379:6379
+    command: [
+      "redis-server",
+      "--requirepass", "${REDIS_PASSWORD}",
+      "--appendonly", "no",
+      "--save", "",
+      "--maxmemory", "480mb",
+      "--maxmemory-policy", "allkeys-lru"
+    ]
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      REDIS_PASSWORD: algashop
+  algashop-localstack:
+    image: localstack/localstack:4.13.1
+    ports:
+      - 4566:4566
+      - 4510-4559:4510-4559
+    environment:
+      SERVICES: s3
+      DEBUG: 1
+      LS_ACCESS_KEY_ID: LSIAQAAAAAAVNCBMPNSG
+      LS_SECRET_ACCESS_KEY: test
+      LS_REGION: us-east-1
+    volumes:
+      - ./etc/aws/init.sh:/etc/localstack/init/ready.d/init-aws.sh
+      - ./etc/aws:/etc/aws
+      - ./etc/images:/etc/images
+    healthcheck:
+      test: curl --location 'http://localhost:4566/_localstack/health'
+    deploy:
+      resources:
+        limits:
+          memory: 1GB
+volumes:
+  algashop-postgres:
+  algashop-mongodb-1:
+  algashop-mongodb-2:
+  algashop-mongodb-3:

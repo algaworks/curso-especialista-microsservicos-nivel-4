@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: ordering
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+  flyway:
+    enabled: false
+    locations: classpath:db/migration
+  cloud:
+    discovery:
+      client:
+        composite-indicator:
+          enabled: false
+
+algashop:
+  integrations:
+    shipping.provider: RAPIDEX
+
+management:
+  info:
+    env.enabled: true
+  health:
+    redis:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+      group:
+        readiness:
+          include: db,readinessState
+      status:
+        order: "DOWN, OUT_OF_SERVICE, UNKNOWN, DEGRADED, UP"
+info:
+  app.name: AlgaShop Ordering API

@@ -1,0 +1,8 @@
+spring:
+  cache:
+    type: redis
+  mongodb:
+    uri: mongodb://algashop-mongodb-1:27017,algashop-mongodb-2:27018,algashop-mongodb-3:27019/product_catalog?replicaSet=rs0
+  data:
+    redis:
+      host: algashop-redis

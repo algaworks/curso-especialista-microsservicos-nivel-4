@@ -1,0 +1,39 @@
+spring:
+  cache:
+    type: redis
+  mongodb:
+    uri: mongodb://localhost:27017,localhost:27018,localhost:27019/product_catalog?replicaSet=rs0
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: algashop
+      database: 0
+      timeout: 20
+  cloud:
+    aws:
+      region:
+        static: us-east-1
+      endpoint: http://algashop-localstack:4566
+      credentials:
+        access-key: LSIAQAAAAAAVNCBMPNSG
+        secret-key: test
+      s3:
+        enabled: true
+        path-style-access-enabled: true
+logging:
+  level:
+    org.mongodb.driver.protocol.command: DEBUG
+#    org.mongodb.driver.protocol.query: DEBUG
+#    org.mongodb.driver.connection: DEBUG
+    org.mongodb.driver.cluster: OFF
+
+algashop:
+  data-load:
+    enabled: true
+    auto-delete: true
+  mapping:
+    image-storage-url: http://algashop-localstack:4566/algashop-product-image
+  storage:
+    s3:
+      bucket-name: algashop-product-image

@@ -1,0 +1,43 @@
+server.port: 8083
+
+spring:
+  application:
+    name: product-catalog
+  data:
+    mongodb:
+      auto-index-creation: true
+
+logging:
+  level:
+    org.mongodb.driver.cluster: OFF
+
+algashop:
+  data-load:
+    enabled: false
+    auto-delete: false
+    sources:
+      - location: db/testdata/categories.json
+        collection: categories
+      - location: db/testdata/products.json
+        collection: products
+
+management:
+  info:
+    env.enabled: true
+  health:
+    redis:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+      group:
+        readiness:
+          include: mongo,readinessState
+      status:
+        order: "DOWN, OUT_OF_SERVICE, UNKNOWN, DEGRADED, UP"
+info:
+  app.name: AlgaShop Product Catalog API

@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: template
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+  flyway:
+    enabled: false
+    locations: classpath:db/migration

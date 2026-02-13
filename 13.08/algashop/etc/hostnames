@@ -1,0 +1,7 @@
+127.0.0.1 algashop-mongodb-1
+127.0.0.1 algashop-mongodb-2
+127.0.0.1 algashop-mongodb-3
+
+127.0.0.1 algashop-localstack
+127.0.0.1 s3.algashop-localstack
+127.0.0.1 algashop-product-image.algashop-localstack
