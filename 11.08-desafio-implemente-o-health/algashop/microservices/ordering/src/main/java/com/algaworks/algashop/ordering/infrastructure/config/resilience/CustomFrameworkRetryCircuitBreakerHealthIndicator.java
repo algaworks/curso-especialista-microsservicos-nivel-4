@@ -36,7 +36,7 @@ public class CustomFrameworkRetryCircuitBreakerHealthIndicator implements Health
             Map<String, Object> cbDetails = new HashMap<>();
             cbDetails.put("state", state.name());
 
-            if (state == CircuitBreakerRetryPolicy.State.OPEN) {
+            if (state != CircuitBreakerRetryPolicy.State.CLOSED) {
                 indicatorStatus = "DEGRADED";
                 if (policy.getLastException() != null
                         && policy.getLastException().getCause() != null) {
